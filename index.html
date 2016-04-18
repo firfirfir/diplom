@@ -34,61 +34,67 @@
 			<button id="subtitles" type="button" data-state="subtitles" class="btn btn-default glyphicon glyphicon-subtitles  col-md-1"><!--CC--></button>
 			<button id="settings" type="button" data-state="settings" class="btn btn-default glyphicon glyphicon-cog  col-md-1"><!--CC--></button>
 		</div>
+	
+		<div id="mainSettingsPanel">
+			
+				<div class="col-md-12 label animation animation-hide" id="settingsPanel">
 
-		<div class="col-md-12 label" id="settingsPanel">
+			<div class="row">
+				<div class="btn-group pull-left col-md-12">
+			  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    Аудио по умолчанию <span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu" id="audioSelect">
+			  
+			  </ul>
+			</div>
+			</div>
+			
+			<form enctype="multipart/form-data" action="php/subtitles.php" method="post">
+				<div class="row">
+				<div class="col-md-5 pull-left text-left fileUpload">
+					<label>Завантажини субтитри:</label> 
+					<div class="btn btn-default glyphicon glyphicon-upload">
+						<input  type="file" name="file" class="upload" />	
+					</div>
+				</div>
+				<div class="col-md-3 settings-align">
+					<label>Затримка(мс)</label>
+					<input type="text" name="delay" />
+				</div>
+				<div class="col-md-3 pull-right settings-align-btn">
+					<input type="submit" value="ОК" id="subtitles-submit" class="btn ntn-default" />
+				</div>
+				</div>
+			</form>
+			
+			<form enctype="multipart/form-data" action="php/audio.php" method="post">
+				<div class="row">
+				<div class="col-md-5 pull-left text-left fileUpload">
 
-		<div class="row">
-			<div class="btn-group pull-left col-md-12">
-		  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		    Аудио по умолчанию <span class="caret"></span>
-		  </button>
-		  <ul class="dropdown-menu" id="audioSelect">
-		  
-		  </ul>
-		</div>
+					<label>Завантажини аудіо:</label> 
+					<div class="btn btn-default glyphicon glyphicon-upload">
+						<input  type="file" name="file" class="upload" />	
+					</div>
+				</div>
+				<div class="col-md-3 settings-align">
+					<label>Затримка(мс)</label>
+					<input type="text" name="delay" />
+				</div>
+				<div class="col-md-3 pull-right settings-align-btn">
+					<input type="submit" value="ОК" id="subtitles-submit" class="btn ntn-default" />
+				</div>
+				</div>
+			</form>
+
+			</div>
+
 		</div>
 		
-		<form enctype="multipart/form-data" action="php/subtitles.php" method="post">
-			<div class="row">
-			<div class="col-md-5 pull-left text-left fileUpload">
-				<label>Завантажини субтитри:</label> 
-				<div class="btn btn-default glyphicon glyphicon-upload">
-					<input  type="file" name="file" class="upload" />	
-				</div>
-			</div>
-			<div class="col-md-3 settings-align">
-				<label>Затримка</label>
-				<input type="text" />
-			</div>
-			<div class="col-md-3 pull-right settings-align-btn">
-				<input type="submit" value="ОК" id="subtitles-submit" class="btn ntn-default" />
-			</div>
-			</div>
-		</form>
-		
-		<form enctype="multipart/form-data" action="php/main.php" method="post">
-			<div class="row">
-			<div class="col-md-5 pull-left text-left fileUpload">
-
-				<label>Завантажини аудіо:</label> 
-				<div class="btn btn-default glyphicon glyphicon-upload">
-					<input  type="file" name="file" class="upload" />	
-				</div>
-			</div>
-			<div class="col-md-3 settings-align">
-				<label>Затримка</label>
-				<input type="text" />
-			</div>
-			<div class="col-md-3 pull-right settings-align-btn">
-				<input type="submit" value="ОК" id="subtitles-submit" class="btn ntn-default" />
-			</div>
-			</div>
-		</form>
-
-		</div>
 	</figure>
 	<script src="node_modules/jquery/dist/jquery.min.js"></script>
 	<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="node_modules/vtt.js/lib/vtt.js"></script>
 	<script src="js/video-player.js"></script>
 </body>
 </html>

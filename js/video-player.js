@@ -1,4 +1,4 @@
-(function () {
+
 	'use strict';
 
 	var supportsVideo = !!document.createElement('video').canPlayType;
@@ -9,11 +9,50 @@
 		var videoControls = document.getElementById('video-controls');
 
 		var audios = [
-			{1: "../video-player-with-captions/audio/default/1.mp3"},
-			{2: "../video-player-with-captions/audio/default/2.mp3"}
+			{	name: '1',
+				path: "./audio/default/1.mp3",
+				delay: 0
+			},{
+				name: '2',
+				path: "./audio/default/2.mp3",
+				delay: 0
+			}
 		];
 
-		var audio = new Audio(audios[0][Object.keys[0]]);
+///Work with delay in vtt files/////////////////////////////////////
+		var allText =''
+
+		function readTextFile(file){
+
+	    var rawFile = new XMLHttpRequest();
+	    rawFile.open("GET", file, false);
+	    rawFile.onreadystatechange = function ()
+	    {
+	        if(rawFile.readyState === 4)
+	        {
+	            if(rawFile.status === 200 || rawFile.status == 0)
+	            {
+	                allText = rawFile.responseText;
+	                //alert(allText);
+	            }
+	        }
+	    }
+	    rawFile.send(null);
+	}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+		if(getCookie('isUserAudio')) {
+			audios.push({
+				name: 'Users',
+				path: './audio/users/user.mp3',
+				delay: parseInt(getCookie('isUserAudio')) || 0
+			})
+		}
+
+		var index = localStorage.getItem('audio_id') && audios[ localStorage.getItem('audio_id') ] || 0;
+		var audio = new Audio(audios[index].path);
+		
 		var audioSelect = document.getElementById("audioSelect");
 
 		video.controls = false;
@@ -46,15 +85,25 @@
 			if (dir) {
 				var currentVolume = Math.floor(video.volume * 10) / 10;
 				if (dir === '+') {
-					if (currentVolume < 1) video.volume += 0.1;
+					if (currentVolume < 1)  audio.volume = video.volume += 0.1;
 				}
 				else if (dir === '-') {
-					if (currentVolume > 0) video.volume -= 0.1;
+					if (currentVolume > 0)  audio.volume = video.volume -= 0.1;
 				}
-				if (currentVolume <= 0) video.muted = true;
-				else video.muted = false;
+				if (currentVolume <= 0) {
+					
+					video.muted  = true;
+					audio.volume = 0;
+
+				} else {
+					
+					video.muted  = false;
+					audio.volume = video.volume;
+
+				}
 			}
 			changeButtonState('mute');
+			console.log(audio.volume)
 		}
 
 		var alterVolume = function(dir) {
@@ -113,13 +162,28 @@
 				else if (type == 'mute') {
 					mute.setAttribute('class', video.muted ? 'btn btn-default glyphicon glyphicon-volume-off col-md-1' : 'btn btn-default glyphicon glyphicon-volume-up col-md-1');
 					mute.setAttribute('data-state', video.muted ? 'unmute' : 'mute');
+					console.log('audio',audio.muted)
 				}
 			}
 
 
 			video.addEventListener('play', function() {
-				
-				audio.play();
+
+				if(video.currentTime == 0) {
+
+					setTimeout(function () {
+
+							audio.currentTime  = 0;
+							audio.play();
+
+					}, audios[index].delay)
+
+				} else {
+
+					 audio.play();
+
+				}
+
 				changeButtonState('playpause');
 			
 			}, false);
@@ -174,7 +238,7 @@
 							video.textTracks[i].mode = 'hidden';
 						}
 					}
-					subtitlesMenu.style.display = 'none';
+					subtitlesMenu.classList.add('animation-hide');
 				});
 				subtitleMenuButtons.push(button);
 				return listItem;
@@ -184,9 +248,10 @@
 
 			var subtitlesMenu;
 			if (video.textTracks) {
-				var df = document.createDocumentFragment();
+
+				var df = document.getElementById('mainSettingsPanel');
 				var subtitlesMenu = df.appendChild(document.createElement('ul'));
-				subtitlesMenu.className = 'subtitles-menu col-md-1 col-md-offset-10';
+				subtitlesMenu.className = 'subtitles-menu col-md-1 col-md-offset-10 animation animation-hide';
 				subtitlesMenu.appendChild(createMenuItem('subtitles-off', '', 'Off'));
 				
 				for (var i = 0; i < video.textTracks.length; i++) {
@@ -201,12 +266,21 @@
 					subtitlesMenu.appendChild(createMenuItem('subtitles-' + video.textTracks[i].language, video.textTracks[i].language, video.textTracks[i].label));						
 					
 				}
-				videoControls.appendChild(subtitlesMenu);
+				//videoControls.appendChild(subtitlesMenu);
+				df.appendChild(subtitlesMenu);
 			}
 			subtitles.addEventListener('click', function(e) {
+
 				if (subtitlesMenu) {
-					subtitlesMenu.style.display = (subtitlesMenu.style.display == 'block' ? 'none' : 'block');
-				}
+
+						var result = subtitlesMenu.classList.contains('animation-hide');
+
+						if( result ) subtitlesMenu.classList.remove('animation-hide');
+						else subtitlesMenu.classList.add('animation-hide');
+				}	
+				
+
+				console.log(subtitlesMenu.classList)
 			});
 
 
@@ -219,6 +293,7 @@
 			});
 			mute.addEventListener('click', function(e) {
 				video.muted = !video.muted;
+				audio.muted = !audio.muted;
 				changeButtonState('mute');
 			});
 			volinc.addEventListener('click', function(e) {
@@ -262,11 +337,22 @@
 		}
 	 }
 
+	
 	 audios.map(function(audio, index) {
 
-	 		debugger
-	 		audioSelect.innerHTML += ' <li><a href="#">' + Object.keys(audio)[0] + '</a></li>';
+	 		var newAudio = document.createElement('li');
+	 		newAudio.innerHTML =  '<a href="#">' + audios[index].name + '</a>';
+	 	  audioSelect.appendChild( newAudio );
 
+	 		newAudio.addEventListener('click', function(e) {
+
+	 				(function(index) {
+	 					localStorage.setItem('audio_id', index);
+	 					location.reload();
+	 					//audio = new Audio(audios[index][Object.keys(audios[index])[0]]);
+	 				})(index);
+
+	 		});
 	 });
 
 
@@ -278,10 +364,18 @@
 	}
 
 	settings.addEventListener('click', function(e) {
+
+
+		if(settingsPanel.classList.contains('animation-hide')) {
+
+				settingsPanel.classList.remove('animation-hide');
+
+		} else {
+
+				settingsPanel.classList.add('animation-hide');
+		}
 			
-		settingsPanel.style.display = (settingsPanel.style.display == 'inline' ? 'none' : 'inline');
+		//settingsPanel.style.display = (settingsPanel.style.display == 'inline' ? 'none' : 'inline');
 				
 	});
 
-
- })();

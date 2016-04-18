@@ -8,7 +8,6 @@ html {
 }
 
 #settingsPanel {
-	display: none;
 	padding: 10px;
 	font-size: 12pt;
 }
@@ -16,7 +15,9 @@ html {
 
 .subtitles-menu {
 	list-style: none;
-	display: none;
+	position: absolute !important;
+	bottom: -35%;
+  z-index: 100;
   background-color: rgba(192, 194, 208, 0.88);
   width: 18%!important;
 }
@@ -94,4 +95,21 @@ div.progress {
 
 .settings-align-btn {
 	margin-top: 10px;
+}
+
+.settings-align-btn input {
+	margin-left: 20px;
+}
+
+.animation {
+	opacity: 1;
+	transition: all linear 0.5s;
+}
+
+.animation-hide {
+	opacity: 0;
+}
+
+#mainSettingsPanel {
+	position: relative;
 }
